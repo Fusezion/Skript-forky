@@ -34,8 +34,10 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.pdc.holders.CustomPersistentDataHolder;
 
 import java.io.NotSerializableException;
 import java.io.StreamCorruptedException;
@@ -46,7 +48,7 @@ import java.util.stream.Collectors;
 
 @ContainerType(ItemStack.class)
 public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>, YggdrasilExtendedSerializable,
-	AnyNamed, AnyAmount {
+	AnyNamed, AnyAmount, CustomPersistentDataHolder {
 
 	static {
 		// This handles updating ItemType and ItemData variable records
@@ -1515,6 +1517,18 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	@Override
 	public void setAmount(@Nullable Number amount) throws UnsupportedOperationException {
 		this.setAmount(amount != null ? amount.intValue() : 0);
+	}
+
+	@Override
+	public @NotNull PersistentDataContainer getPersistentDataContainer() {
+		return getItemMeta().getPersistentDataContainer();
+	}
+
+	@Override
+	public void setPersistentDataContainer(@NotNull PersistentDataContainer persistentDataContainer) {
+		ItemMeta meta = getItemMeta();
+		persistentDataContainer.copyTo(meta.getPersistentDataContainer(), true);
+		setItemMeta(meta);
 	}
 
 }

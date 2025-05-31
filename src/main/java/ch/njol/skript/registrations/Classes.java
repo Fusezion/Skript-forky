@@ -838,4 +838,20 @@ public abstract class Classes {
 		return s.deserialize(value);
 	}
 
+	public static @Nullable Serializer<?> getSerializer(Class<?> clazz) {
+		ClassInfo<?> classInfo = getExactClassInfo(clazz);
+		if (classInfo == null)
+			classInfo = getSuperClassInfo(clazz);
+		return classInfo == null ? null : getSerializer(classInfo);
+	}
+
+	public static @Nullable Serializer<?> getSerializer(ClassInfo<?> classInfo) {
+		if (classInfo.getSerializer() == null && classInfo.getSerializeAs() == null)
+			return null;
+		Serializer<?> serializer = classInfo.getSerializer();
+		if (serializer == null)
+			serializer = getSerializer(classInfo.getSerializeAs());
+		return serializer;
+	}
+
 }
